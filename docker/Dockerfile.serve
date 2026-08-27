@@ -2,11 +2,6 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# libglib2.0-0 needed by some torchvision operations
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
 # serving deps only — no tensorboard, no training libs
 COPY requirements/serve.txt .
 RUN pip install --no-cache-dir -r serve.txt
