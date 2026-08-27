@@ -1,0 +1,23 @@
+# Stage 1: install all dependencies in a clean layer
+FROM python:3.11-slim AS base
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements/train.txt .
+RUN pip install --no-cache-dir -r train.txt
+
+# Stage 2: copy source files and set entrypoint
+FROM base AS training
+
+COPY src/ ./src/
+COPY configs/ ./configs/
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app/src
+
+# data and checkpoints come from mounted volumes at runtime
+ENTRYPOINT ["python", "src/train.py"]
