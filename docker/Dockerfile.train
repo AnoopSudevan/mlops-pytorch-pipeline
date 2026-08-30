@@ -8,7 +8,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements/train.txt .
-RUN pip install --no-cache-dir -r train.txt
+RUN python -m pip install --upgrade pip \
+    && pip install \
+       --no-cache-dir \
+       --default-timeout=1000 \
+       --retries=10 \
+       torch==2.1.2 torchvision==0.16.2 \
+       --index-url https://download.pytorch.org/whl/cpu \
+    && pip install \
+       --no-cache-dir \
+       --default-timeout=1000 \
+       --retries=10 \
+       -r train.txt
 
 # Stage 2: copy source files and set entrypoint
 FROM base AS training
